@@ -1,0 +1,30 @@
+--- 
+- hosts: docker
+  become: yes 
+
+  tasks:
+    - name: Install stuff
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+
+    - name: Add Docker GPG key
+      ansible.builtin.shell: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+          
+    - name: Add specified repository into sources list
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        state: present 
+
+    - name: install docker
+      ansible.builtin.apt:
+       name: docker-ce
+       update_cache: yes
+       state: present
